@@ -8,6 +8,9 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
+    
+    this.addTrack = this.addTrack.bind(this);
+
 
     this.state = {
       searchResults: [
@@ -33,7 +36,16 @@ class App extends React.Component {
         id: "99",
       },
     ],
+  };
+  }
+
+  addTrack(track) {
+    let tracks = this.state.playlistTracks;
+    if (tracks.find(savedTrack => savedTrack.id === track.id)) {
+      return;
     }
+    tracks.push(track);
+    this.setState({playlistTracks: tracks})
   }
 
   render () {
@@ -45,7 +57,7 @@ class App extends React.Component {
         <SearchBar />
         <div className="App-playlist">
           {/* <!-- Add a SearchResults component --> */}
-          <SearchResults searchResults={this.state.searchResults} />
+          <SearchResults searchResults={this.state.searchResults} onAdd={this.addTrack} />
           {/* <!-- Add a Playlist component --> */}
           <Playlist playlistName={this.state.playlistName} playlistTracks={this.state.playlistTracks} />
         </div>
@@ -53,7 +65,5 @@ class App extends React.Component {
     </div>
     )
   }
-
 }
-
 export default App;

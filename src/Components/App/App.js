@@ -48,6 +48,7 @@ class App extends React.Component {
     const trackUris = this.state.playlistTracks.map(track => track.uri);
     //  Pass the trackURIs array and playlistName to a method (later) that will save the user’s playlist to their account.
     Spotify.savePlaylist(this.state.playlistName, trackUris).then( () => {
+      alert('Playlist saved!');
       this.setState( {
         playlistName: `New Playlist`,
         playlistTracks: [],

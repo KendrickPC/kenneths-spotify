@@ -1,11 +1,11 @@
 const clientID = '573adad7e69c4042a21a0f02c4dddc8e';
 const redirectURI = "http://localhost:3000/";
+
 let accessToken;
 
 export const Spotify = {
-
   getAccessToken() {
-    if (accessToken !== '') {
+    if (accessToken) {
       return accessToken;
     }
     const hasAccessToken = window.location.href.match(/access_token=([^&]*)/);
@@ -13,18 +13,19 @@ export const Spotify = {
 
     if (hasAccessToken && hasExpiresIn) {
       accessToken = hasAccessToken[1];
-      const expiresIn = Number(hasExpiresIn[1])
-      // Clears the parameter from the URL, so the app doesn't try grabbing the access token after it has expired.
+      let expiresIn = Number(hasExpiresIn[1])
+      // clears the params and acquires a new access token when upon expiration.
       window.setTimeout( () => accessToken = '', expiresIn * 1000 );
       window.history.pushState('Access Token', null, '/');
       return accessToken;
     } else {
       const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectURI}`;
-      window.location = accessUrl;
+      window.location.href = accessUrl;
       }
   },
   // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
   search(term) {
+    const accessToken = Spotify.getAccessToken();
     return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, {
       headers: {Authorization: `Bearer ${accessToken}`}
     })
@@ -59,16 +60,35 @@ export const Spotify = {
     };
     let userID;
 
-    return fetch(`https://api.spotify.com/v1/me`, {headers: headers} ).then(
-      response => {
-        if (response.ok) {
-          return response.json();
-        } 
-      }
-    )
+    return fetch(`https://api.spotify.com/v1/me`, {headers: headers} 
+      ).then(
+        response => {
+          if (response.ok) {
+            return response.json();
+          } 
+        }
+      ).then(
+       jsonResponse => {
+         userID = jsonResponse.id;
+         return fetch(`https://api.spotify.com/v1/users/${userID}/playlists`, {
+           headers: headers,
+           method: 'POST',
+           body: JSON.stringify( {name: name} )
+         })
+       }
+      ).then(response => response.json() 
+      ).then(jsonResponse => {
+        const playlistId = jsonResponse.id;
+        return fetch(`https://api.spotify.com/v1/users/${userID}/playlists/${playlistId}/tracks`, {
+          headers: headers,
+          method: 'POST',
+          body: JSON.stringify( {uris: trackUris} ),
+        })
+      })
 
   },
   
 };
 
 
+export default Spotify;

@@ -17,41 +17,21 @@ class App extends React.Component {
     this.search = this.search.bind(this);
 
     this.state = {
-
       // Update the state of searchResults with the search method of Spotify.js.
-      searchResults: [
-      {
-        name: "HUH? NAME?",
-        artist: "BTS",
-        album: "The Most Beautiful Moment in Life",
-        id: "1",
-      },
-      {
-        name: "HUH? NAME2?",
-        artist: "BTS2",
-        album: "The Most Beautiful Moment in Life2",
-        id: "2",
-      },
-    ],
-    playlistName: "PIANO SONGS",
-    playlistTracks: [
-      {
-        name: "Fix You",
-        artist: "Coldplay",
-        album: "Rush of Blood",
-        id: "99",
-      },
-    ],
-  };
+      searchResults: [],
+      playlistName: "New Playlist",
+      playlistTracks: [],
+    };
   }
 
   addTrack(track) {
     let tracks = this.state.playlistTracks;
     if (tracks.find(savedTrack => savedTrack.id === track.id)) {
       return;
-    };
-    tracks.push(track);
-    this.setState( {playlistTracks: tracks} );
+    } else {
+      tracks.push(track);
+      this.setState( {playlistTracks: tracks} );
+    }
   }
 
   removeTrack(track) {
@@ -65,13 +45,18 @@ class App extends React.Component {
   }
 
   savePlaylist() {
-    const trackUris = this.state.playlistName.map(track => track.uri);
+    const trackUris = this.state.playlistTracks.map(track => track.uri);
     //  Pass the trackURIs array and playlistName to a method (later) that will save the user’s playlist to their account.
-
+    Spotify.savePlaylist(this.state.playlistName, trackUris).then( () => {
+      this.setState( {
+        playlistName: `New Playlist`,
+        playlistTracks: [],
+      } )
+    });
   }
 
   search(term) {
-    Spotify.search(term).then(searchResults => {
+    return Spotify.search(term).then(searchResults => {
       this.setState( {searchResults: searchResults} )
     })
   }
@@ -84,6 +69,7 @@ class App extends React.Component {
         {/* <!-- Add a SearchBar component --> */}
         <SearchBar
           onSearch={this.search}
+          onClick = {this.search}
         />
         <div className="App-playlist">
           {/* <!-- Add a SearchResults component --> */}
@@ -104,6 +90,13 @@ class App extends React.Component {
     </div>
     )
   }
+
+  componentDidMount() {
+    window.addEventListener('load', Spotify.search(''));
+  }
+
 }
+
+
 
 export default App;

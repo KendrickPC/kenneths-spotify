@@ -1,5 +1,5 @@
 const clientID = '573adad7e69c4042a21a0f02c4dddc8e';
-const redirectURI = 'http://localhost:3000/';
+const redirectURI = 'http://kenneths_spotify.surge.sh/';
 let accessToken;
 
 export const Spotify = {

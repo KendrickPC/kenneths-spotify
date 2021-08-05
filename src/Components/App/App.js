@@ -70,7 +70,7 @@ class App extends React.Component {
         {/* <!-- Add a SearchBar component --> */}
         <SearchBar
           onSearch={this.search}
-          onClick = {this.search}
+          // onClick = {this.search}
         />
         <div className="App-playlist">
           {/* <!-- Add a SearchResults component --> */}

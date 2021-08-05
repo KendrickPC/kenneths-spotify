@@ -5,8 +5,6 @@ let accessToken;
 export const Spotify = {
 
   getAccessToken() {
-    console.log("first")
-    console.log(accessToken)
     if (accessToken) {
       return accessToken;
     }
@@ -39,12 +37,13 @@ export const Spotify = {
       if (!jsonResponse.tracks) {
         return [];
       }
-      console.log(jsonResponse.tracks);
+      // console.log(jsonResponse.tracks.items.map(track => track.preview_url));
       return jsonResponse.tracks.items.map(track => ({
         id: track.id,
         name: track.name,
         artist: track.artists[0].name,
-        uri: track.uri
+        uri: track.uri,
+        preview: track.preview_url,
       }));
     });
   },
